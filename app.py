@@ -403,11 +403,25 @@ def upload_csv():
                 "mape": safe_mape(y_true, preds),
             }
 
+        # CSV to Base64
+        import base64, io
+        csv_buffer = io.StringIO()
+        clean_df.to_csv(csv_buffer, index=False)
+        csv_bytes = csv_buffer.getvalue().encode('utf-8')
+        csv_b64 = base64.b64encode(csv_bytes).decode('utf-8')
+
         preview_rows = clean_df.head(10).to_dict(orient="records")
-        return json_nocache({"rows_in": len(user_df), "rows_used": len(clean_df),
-                             "preview": preview_rows, **metrics})
+
+        return json_nocache({
+            "rows_in": len(user_df),
+            "rows_used": len(clean_df),
+            "preview": preview_rows,
+            "csv_b64": csv_b64,
+            **metrics
+        })
     except Exception:
         return safe_error("CSV upload failed")
+
 
 # ---------------------------------------------------
 if __name__ == "__main__":
