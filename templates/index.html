@@ -1,122 +1,641 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Stock Price Predictor</title>
 
-  <!-- (Optional) Bootstrap – internet connected ho to use hoga -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <style>
-    :root { --brand:#2563eb; --bg:#0b1220; --card:#111827; --muted:#94a3b8; }
-    body{ background:#f6f8fb; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
-    .wrap{ max-width:780px; margin:48px auto; padding:0 16px; }
-    .card{
-      background:#fff; border:1px solid #e5e7eb; border-radius:16px;
-      box-shadow:0 10px 30px rgba(2,6,23,.06); padding:28px;
+    :root {
+      --brand: #2563eb;
     }
-    .title{ font-weight:700; font-size:26px; margin-bottom:8px; }
-    .subtitle{ color:#6b7280; margin-bottom:24px; }
-    .form-label{ font-weight:600; color:#111827; }
-    .btn-primary{ background:var(--brand); border-color:var(--brand); }
-    .btn-primary:hover{ filter:brightness(.95); }
-    .result{
-      margin-top:18px; padding:16px; border-radius:12px;
-      background:#eef2ff; border:1px dashed #c7d2fe; color:#1e3a8a;
-      font-weight:700; font-size:18px; display:none;
+
+    body {
+      background: #f6f8fb;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
     }
-    .error{
-      margin-top:14px; padding:12px; border-radius:10px;
-      background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; display:none;
+
+    .wrap {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
     }
-    .spinner{ display:none; margin-left:10px; width:18px; height:18px;
-      border:3px solid #c7d2fe; border-top-color:#1d4ed8; border-radius:50%;
-      animation:spin .9s linear infinite;
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(2, 6, 23, .06);
     }
-    @keyframes spin{ to{ transform:rotate(360deg)} }
-    .hint{ color:#6b7280; font-size:12px; }
+
+    .title {
+      font-weight: 700;
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .spinner {
+      display: none;
+      margin-left: 10px;
+      width: 18px;
+      height: 18px;
+      border: 3px solid #c7d2fe;
+      border-top-color: #1d4ed8;
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .result {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      background: #eef2ff;
+      border-radius: 10px;
+      border: 1px dashed #c7d2fe;
+      color: #1e3a8a;
+      font-weight: 700;
+    }
+
+    .error {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fee2e2;
+      color: #7f1d1d;
+      border: 1px solid #fecaca;
+    }
+
+    .graph-wrap {
+      display: none;
+      margin-top: 12px;
+    }
+
+    .graph-img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
   </style>
 </head>
+
 <body>
+  <nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Stock Market Prediction Web App</span>
+    </div>
+  </nav>
   <div class="wrap">
     <div class="card">
-      <div class="title">📈 Stock Price Predictor</div>
-      <div class="subtitle">Enter OHLC + Volume and get predicted <b>Close</b> price.</div>
+      <div class="title">Stock Price Predictor</div>
+      <!-- <p>Enter <b>OHLC</b> to get a single prediction.</p> -->
 
-      <form id="predictForm" class="row g-3">
+      <!-- Point prediction -->
+      <h4 class="mb-3 text-primary">Single Prediction (OHLC Input)</h4>
+      <form id="predictForm" class="row g-3" novalidate>
         <div class="col-md-6">
           <label class="form-label" for="open">Open</label>
-          <input class="form-control" id="open" type="number" step="any" placeholder="e.g. 100" required>
+          <input id="open" class="form-control" type="number" placeholder="e.g 100" step="any" required>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="high">High</label>
-          <input class="form-control" id="high" type="number" step="any" placeholder="e.g. 105" required>
+          <input id="high" class="form-control" type="number" placeholder="e.g 105" step="any" required>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="low">Low</label>
-          <input class="form-control" id="low" type="number" step="any" placeholder="e.g. 95" required>
+          <input id="low" class="form-control" type="number" placeholder="e.g 95" step="any" required>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="volume">Volume</label>
-          <input class="form-control" id="volume" type="number" step="1" placeholder="e.g. 2000000" required>
-          <div class="hint">Use whole numbers for volume (no commas).</div>
+          <input id="volume" class="form-control" type="number" placeholder="e.g 2000000" step="1" required>
+          <p>Use Numeric Values</p>
         </div>
-
         <div class="col-12 d-flex align-items-center">
           <button id="btn" class="btn btn-primary" type="submit">Predict</button>
-          <div class="spinner" id="spin"></div>
+          <div id="spin" class="spinner" aria-hidden="true"></div>
         </div>
       </form>
 
-      <div id="result" class="result"></div>
-      <div id="error" class="error"></div>
+      <div id="result" class="result" aria-live="polite"></div>
+      <div id="error" class="error" aria-live="assertive"></div>
+
+      <hr class="my-4">
+
+      <!-- Range prediction -->
+      <div class="row">
+        <div class="col-12">
+          <h5 class="mb-3 text-success">Prediction Graph (Date Range)</h5>
+        </div>
+      </div>
+
+      <form id="dateForm" class="row g-3" novalidate>
+        <div class="col-md-3">
+          <label class="form-label" for="dataset">Dataset</label>
+          <select id="dataset" class="form-control" required>
+            <option>Loading…</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="start_date">Start Date</label>
+          <input id="start_date" class="form-control" type="date" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="end_date">End Date</label>
+          <input id="end_date" class="form-control" type="date" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="symbol">Symbol (optional)</label>
+          <select id="symbol" class="form-control">
+            <option value="">(All)</option>
+          </select>
+        </div>
+
+        <div class="col-12 d-flex align-items-center">
+          <button id="btnRange" class="btn btn-success" type="submit">Get Prediction Graph</button>
+          <div id="spinRange" class="spinner" aria-hidden="true"></div>
+        </div>
+      </form>
+
+      <div id="rangeErr" class="error" aria-live="assertive"></div>
+      <div id="metrics" class="result" aria-live="polite"></div>
+      <div id="graphWrap" class="card mt-3 p-3" style="display: none;">
+        <h5 class="mb-3 text-center">Prediction Graph</h5>
+        <img id="rangeGraph" class="graph-img" alt="Prediction Graph" />
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Compare two stocks -->
+      <div class="row mb-2">
+        <div class="col-12">
+          <h5 class="mb-3 text-warning">Compare Two Stocks (Date Range)</h5>
+        </div>
+      </div>
+      <form id="compareForm" class="row g-3" novalidate>
+        <div class="col-md-3">
+          <label class="form-label" for="datasetCmp">Dataset</label>
+          <select id="datasetCmp" class="form-control" required>
+            <option>Loading…</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="c_start">Start</label>
+          <input id="c_start" class="form-control" type="date" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="c_end">End</label>
+          <input id="c_end" class="form-control" type="date" required>
+        </div>
+        <div class="col-md-1">
+          <label class="form-label" for="sym1">Sym 1</label>
+          <select id="sym1" class="form-control" required>
+            <option>Loading…</option>
+          </select>
+        </div>
+        <div class="col-md-1">
+          <label class="form-label" for="sym2">Sym 2</label>
+          <select id="sym2" class="form-control" required>
+            <option>Loading…</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex align-items-center">
+          <button id="btnCmp" class="btn btn-warning" type="submit">Compare</button>
+          <div id="spinCmp" class="spinner" aria-hidden="true"></div>
+        </div>
+      </form>
+
+      <div id="cmpErr" class="error" aria-live="assertive"></div>
+      <div id="cmpMetrics" class="result" aria-live="polite"></div>
+      <div id="cmpWrap" class="card mt-3 p-3" style="display: none;">
+        <h5 class="mb-3 text-center">Compare Two Stocks Graph</h5>
+        <img id="cmpGraph" class="graph-img" alt="Comparison Graph" />
+      </div>
+
+      <hr class="my-4">
+      <!--Compare Multiple Models-->
+      <div class="row mb-2">
+        <div class="col-12">
+          <h5 class="mb-3 text-info">Compare Multiple Models</h5>
+        </div>
+      </div>
+      <form id="modelForm" class="row g-3" novalidate>
+        <div class="col-md-3">
+          <label class="form-label" for="datasetModel">Dataset</label>
+          <select id="datasetModel" class="form-control" required>
+            <option>Loading…</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="m_start">Start Date</label>
+          <input id="m_start" class="form-control" type="date" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="m_end">End Date</label>
+          <input id="m_end" class="form-control" type="date" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="m_symbol">Symbol</label>
+          <select id="m_symbol" class="form-control">
+            <option value="">(All)</option>
+          </select>
+        </div>
+
+        <div class="col-12 d-flex align-items-center">
+          <button id="btnModel" class="btn btn-info" type="submit">Compare Models</button>
+          <div id="spinModel" class="spinner" aria-hidden="true"></div>
+        </div>
+      </form>
+
+      <div id="modelErr" class="error" aria-live="assertive"></div>
+      <div id="modelWrap" class="card mt-3 p-3" style="display: none;">
+        <h5 class="mb-3 text-center">Multiple Models Comparison</h5>
+        <div class="table-responsive">
+          <table id="modelTable" class="table table-bordered table-hover text-center align-middle"></table>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Upload CSV -->
+      <div>
+        <h5 class="mb-2 text-secondary">Upload CSV & Predict</h5>
+      </div>
+      <form id="uploadForm" class="row g-3" enctype="multipart/form-data" novalidate>
+        <div class="col-md-8"><input id="csvFile" class="form-control" type="file" accept=".csv" required></div>
+        <div class="col-md-4 d-flex align-items-center">
+          <button id="btnUpload" class="btn btn-secondary" type="submit">Upload & Predict</button>
+          <div id="spinUpload" class="spinner" aria-hidden="true"></div>
+        </div>
+      </form>
+      <div id="upErr" class="error" aria-live="assertive"></div>
+      <div id="upOk" class="result" aria-live="polite"></div>
+      <div id="upPreviewWrap" class="card mt-3 p-3" style="display: none;">
+        <h5 class="mb-3 text-center">Uploaded CSV Predictions</h5>
+        <div class="table-responsive">
+          <table id="upPreview" class="table table-bordered table-hover text-center align-middle"></table>
+        </div>
+        <div class="text-center mt-3">
+          <a id="dlLink" class="btn btn-success" download="predictions.csv" style="display: none;">Download Predictions CSV
+          </a>
+        </div>
+      </div>
     </div>
   </div>
+  <footer class="text-center mt-5 mb-3 text-muted">Stock Prediction Web App | Built with Flask + ML + Bootstrap <br><a href="https://github.com/Manas5650/StockMarketML" target="_blank">View on GitHub</a></footer>
 
   <script>
-  const form = document.getElementById('predictForm');
-  const resultEl = document.getElementById('result');
-  const errorEl  = document.getElementById('error');
-  const btn = document.getElementById('btn');
-  const spin = document.getElementById('spin');
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = (id) => document.getElementById(id);
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    resultEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    btn.disabled = true; spin.style.display = 'inline-block';
+      // ---------- POINT PREDICTION ----------
+      $('predictForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        $('result').style.display = 'none'; $('error').style.display = 'none';
+        $('btn').disabled = true; $('spin').style.display = 'inline-block';
 
-    const payload = {
-      open:   parseFloat(document.getElementById('open').value),
-      high:   parseFloat(document.getElementById('high').value),
-      low:    parseFloat(document.getElementById('low').value),
-      volume: parseFloat(document.getElementById('volume').value)
-    };
+        const num = (id) => {
+          const v = $(id).valueAsNumber;
+          return Number.isFinite(v) ? v : parseFloat($(id).value);
+        };
 
-    try {
-      // use absolute URL to be safe
-      const res = await fetch('/predict', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
+        const payload = { open: num('open'), high: num('high'), low: num('low'), volume: num('volume') };
+
+        try {
+          const res = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const text = await res.text();
+          let data; try { data = JSON.parse(text); } catch { throw new Error(text); }
+          if (!res.ok || data.error) throw new Error(data.error || 'Server error');
+
+          $('result').innerHTML = `Predicted Close Price: <span style="font-size:22px;">${Number(data.prediction).toFixed(2)}</span>`;
+          $('result').style.display = 'block';
+        } catch (err) {
+          $('error').textContent = err.message || 'Failed to fetch';
+          $('error').style.display = 'block';
+        } finally {
+          $('btn').disabled = false; $('spin').style.display = 'none';
+        }
       });
 
-      const text = await res.text();    // read as text first
-      let data;
-      try { data = JSON.parse(text); }  catch { throw new Error(text); }
+      // ---------- DATES LIMITS (static) ----------
+      const MIN_D = "2013-01-01", MAX_D = "2024-12-31";
+      ['start_date', 'end_date', 'c_start', 'c_end'].forEach(id => {
+        if ($(id)) { $(id).min = MIN_D; $(id).max = MAX_D; }
+      });
+      if ($('start_date')) $('start_date').value = "2013-01-01";
+      if ($('end_date')) $('end_date').value = "2024-12-31";
+      if ($('c_start')) $('c_start').value = "2013-01-01";
+      if ($('c_end')) $('c_end').value = "2024-12-31";
 
-      if (!res.ok || data.error) throw new Error(data.error || 'Server error');
+      // ---------- DATASETS & SYMBOLS ----------
+      async function loadDatasets() {
+        const dsSel = $('dataset');
+        const dsMirror = $('datasetCmp');    // compare-block dataset select
+        const dsModel = $('datasetModel');
 
-      resultEl.innerHTML = `Predicted Close Price: <span style="font-size:22px;">${Number(data.prediction).toFixed(2)}</span>`;
-      resultEl.style.display = 'block';
-    } catch (err) {
-      errorEl.textContent = err.message || 'Failed to fetch';
-      errorEl.style.display = 'block';
-    } finally {
-      btn.disabled = false; spin.style.display = 'none';
-    }
-  });
-    </script>
+        try {
+          const res = await fetch('/datasets', { cache: 'no-store' });
+          if (!res.ok) throw new Error('Failed to fetch datasets');
+          const list = await res.json();
+
+          if (Array.isArray(list) && list.length) {
+            const opts = list.map(d => `<option value="${d}">${d}</option>`).join('');
+            dsSel.innerHTML = opts;
+            dsMirror.innerHTML = opts;
+            dsModel.innerHTML = opts;
+            dsSel.value = list.includes('DEFAULT') ? 'DEFAULT' : list[0];
+            dsMirror.value = dsSel.value;
+            dsModel.value = dsSel.value;
+          } else {
+            const fallback = '<option value="DEFAULT">DEFAULT</option>';
+            dsSel.innerHTML = fallback; dsSel.value = 'DEFAULT';
+            dsMirror.innerHTML = fallback; dsMirror.value = 'DEFAULT';
+            dsModel.innerHTML = fallback; dsModel.value = 'DEFAULT'
+
+          }
+        } catch (err) {
+          console.warn('Failed to load datasets:', err);
+          const fallback = '<option value="DEFAULT">DEFAULT</option>';
+          dsSel.innerHTML = fallback; dsSel.value = 'DEFAULT';
+          dsMirror.innerHTML = fallback; dsMirror.value = 'DEFAULT';
+          dsModel.innerHTML = fallback; dsModel.value = 'DEFAULT';
+        }
+
+        await loadSymbols(); // must run after dataset is set
+      }
+
+      async function loadSymbols() {
+        const dataset = $('dataset').value || 'DEFAULT';
+        const singleSel = $('symbol');
+        const cmpSel1 = $('sym1');
+        const cmpSel2 = $('sym2');
+
+        const setLoading = (el) => el && (el.innerHTML = '<option>Loading…</option>');
+        setLoading(singleSel); setLoading(cmpSel1); setLoading(cmpSel2);
+
+        try {
+          const res = await fetch('/symbols?dataset=' + encodeURIComponent(dataset), { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const list = await res.json(); // e.g. ['AAPL','GOOG',...]
+
+          if (!Array.isArray(list) || !list.length) throw new Error('No symbols from server');
+
+          // singleSel keeps an "(All)" option
+          const optsSingle = ['<option value="">(All)</option>'].concat(list.map(s => `<option value="${s}">${s}</option>`)).join('');
+          if (singleSel) { singleSel.innerHTML = optsSingle; }
+
+          const opts = list.map(s => `<option value="${s}">${s}</option>`).join('');
+          if (cmpSel1) { cmpSel1.innerHTML = opts; cmpSel1.value = list[0]; }
+          if (cmpSel2) { cmpSel2.innerHTML = opts; cmpSel2.value = list.length > 1 ? list[1] : list[0]; }
+        } catch (err) {
+          console.warn('Failed to load symbols:', err);
+          const fallback = '<option value="DEFAULT">DEFAULT</option>';
+          if (singleSel) singleSel.innerHTML = fallback;
+          if (cmpSel1) cmpSel1.innerHTML = `<option value="${dataset}">${dataset}</option>`;
+          if (cmpSel2) cmpSel2.innerHTML = `<option value="${dataset}">${dataset}</option>`;
+        }
+      }
+
+      // keep compare dataset selector in sync
+      $('dataset').addEventListener('change', async () => {
+        $('datasetCmp').value = $('dataset').value;
+        await loadSymbols();
+      });
+      $('datasetCmp').addEventListener('change', async () => {
+        $('dataset').value = $('datasetCmp').value;
+        await loadSymbols();
+      });
+
+      // initial boot
+      loadDatasets();
+
+      // ---------- RANGE GRAPH ----------
+      $('dateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        $('rangeErr').style.display = 'none';
+        $('graphWrap').style.display = 'none';
+        $('metrics').style.display = 'none';
+        $('btnRange').disabled = true; $('spinRange').style.display = 'inline-block';
+
+        const payload = {
+          dataset: $('dataset').value || 'DEFAULT',
+          start_date: $('start_date').value,
+          end_date: $('end_date').value,
+          symbol: $('symbol').value || ''
+
+        };
+
+        try {
+          const res = await fetch('/predict_range', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+
+          if (data.graph) {
+            $('rangeGraph').src = 'data:image/png;base64,' + data.graph;
+            $('graphWrap').style.display = 'block';
+          } else {
+            throw new Error(data.error || 'No graph returned');
+          }
+
+          if (typeof data.rmse !== 'undefined') {
+            $('metrics').innerHTML =
+              `<span class="badge bg-primary">RMSE: ${data.rmse.toFixed(3)}</span>
+    &nbsp;
+    <span class="badge bg-success">MAE: ${data.mae.toFixed(3)}</span>
+    &nbsp;
+    <span class="badge bg-warning text-dark">R²: ${data.r2.toFixed(4)}</span>
+    &nbsp;
+    <span class="badge bg-info text-dark">MAPE: ${data.mape.toFixed(3)}%</span>`
+              ;
+
+
+            $('metrics').style.display = 'block';
+          }
+        } catch (err) {
+          $('rangeErr').textContent = err.message || 'Failed to create range prediction';
+          $('rangeErr').style.display = 'block';
+        } finally {
+          $('btnRange').disabled = false; $('spinRange').style.display = 'none';
+        }
+      });
+
+      // ---------- COMPARE ----------
+      $('compareForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        $('cmpErr').style.display = 'none';
+        $('cmpWrap').style.display = 'none';
+        $('cmpMetrics').style.display = 'none';
+        $('btnCmp').disabled = true; $('spinCmp').style.display = 'inline-block';
+
+        const payload = {
+          dataset: $('datasetCmp').value || 'DEFAULT',
+          start_date: $('c_start').value,
+          end_date: $('c_end').value,
+          sym1: $('sym1').value,
+          sym2: $('sym2').value
+        };
+
+        try {
+          const res = await fetch('/compare_range', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+
+          if (data.graph) {
+            $('cmpGraph').src = 'data:image/png;base64,' + data.graph;
+            $('cmpWrap').style.display = 'block';
+          } else {
+            throw new Error(data.error || 'No graph returned');
+          }
+
+          if (data.metrics) {
+            const parts = Object.entries(data.metrics).map(([k, m]) =>
+              `<div class="mb-2">
+                <span class="badge bg-dark">${k}</span>
+                 &nbsp;
+                <span class="badge bg-primary">RMSE: ${m.rmse.toFixed(3)}</span>
+                &nbsp;
+                <span class="badge bg-success">MAE: ${m.mae.toFixed(3)}</span>
+                &nbsp;
+                <span class="badge bg-warning text-dark">R²: ${m.r2.toFixed(4)}</span>
+                &nbsp;
+                <span class="badge bg-info text-dark">MAPE: ${m.mape.toFixed(3)}%</span>
+              </div>`
+            );
+            $('cmpMetrics').innerHTML = parts.join('');
+            $('cmpMetrics').style.display = 'block';
+          }
+        } catch (err) {
+          $('cmpErr').textContent = err.message || 'Failed to fetch';
+          $('cmpErr').style.display = 'block';
+        } finally {
+          $('btnCmp').disabled = false; $('spinCmp').style.display = 'none';
+        }
+      });
+
+      // ---------- COMPARE MODELS ----------
+      $('modelForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        $('modelErr').style.display = 'none';
+        $('modelWrap').style.display = 'none';
+        $('btnModel').disabled = true;
+        $('spinModel').style.display = 'inline-block';
+
+        const payload = {
+          dataset: $('datasetModel').value || 'DEFAULT',
+          start_date: $('m_start').value,
+          end_date: $('m_end').value,
+          symbol: $('m_symbol').value || ''
+        };
+
+        try {
+          const res = await fetch('/compare_models', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+
+          if (data.metrics) {
+            const cols = ["Model", "RMSE", "MAE", "R²", "MAPE"];
+            const head = `<thead class="table-light"><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>`;
+            const rows = Object.entries(data.metrics).map(([name, m]) =>
+              `<tr>
+                <td><span class="badge bg-dark">${name}</span></td>
+                <td><span class="badge bg-primary">${m.rmse.toFixed(3)}</span></td>
+                <td><span class="badge bg-success">${m.mae.toFixed(3)}</span></td>
+                <td><span class="badge bg-warning text-dark">${m.r2.toFixed(4)}</span></td>
+                <td><span class="badge bg-info text-dark">${m.mape.toFixed(3)}%</span></td>
+              </tr>`
+            ).join('');
+            $('modelTable').innerHTML = head + `<tbody>${rows}</tbody>`;
+            $('modelWrap').style.display = 'block';
+          }
+        } catch (err) {
+          $('modelErr').textContent = err.message || 'Failed to compare models';
+          $('modelErr').style.display = 'block';
+        } finally {
+          $('btnModel').disabled = false;
+          $('spinModel').style.display = 'none';
+        }
+      });
+
+      // ---------- UPLOAD CSV ----------
+      (function () {
+        const form = $('uploadForm'); if (!form) return;
+        const err = $('upErr'), ok = $('upOk'), tbl = $('upPreview'),
+          wrap = $('upPreviewWrap'), link = $('dlLink'),
+          btn = $('btnUpload'), spin = $('spinUpload');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          err.style.display = 'none'; ok.style.display = 'none';
+          wrap.style.display = 'none'; link.style.display = 'none';
+          tbl.innerHTML = ''; btn.disabled = true; spin.style.display = 'inline-block';
+
+          const file = $('csvFile').files[0];
+          if (!file) { err.textContent = 'Please select a CSV file.'; err.style.display = 'block'; btn.disabled = false; spin.style.display = 'none'; return; }
+
+          try {
+            const fd = new FormData(); fd.append('file', file);
+            const res = await fetch('/upload_csv', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+
+            const parts = [`Rows in file: <b>${data.rows_in}</b>`, `Used for prediction: <b>${data.rows_used}</b>`];
+            if (typeof data.rmse !== 'undefined') {
+              parts.push(
+                `<span class="badge bg-primary">RMSE: ${data.rmse.toFixed(3)}</span>`,
+                `<span class="badge bg-success">MAE: ${data.mae.toFixed(3)}</span>`,
+                `<span class="badge bg-warning text-dark">R²: ${data.r2.toFixed(4)}</span>`,
+                `<span class="badge bg-info text-dark">MAPE: ${data.mape.toFixed(3)}%</span>`);
+            }
+            ok.innerHTML = parts.join(' &nbsp; ');
+            ok.style.display = 'block';
+
+            if (Array.isArray(data.preview) && data.preview.length) {
+              const cols = Object.keys(data.preview[0]);
+              const head = `<thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>`;
+              const rows = data.preview.map(r => `<tr>${cols.map(c => `<td>${r[c]}</td>`).join('')}</tr>`).join('');
+              tbl.innerHTML = head + `<tbody>${rows}</tbody>`;
+              wrap.style.display = 'block';
+            }
+
+            if (data.csv_b64) {
+              link.href = 'data:text/csv;base64,' + data.csv_b64;
+              link.style.display = 'inline-block';
+            }
+          } catch (e2) {
+            err.textContent = e2.message || 'Upload failed';
+            err.style.display = 'block';
+          } finally {
+            btn.disabled = false; spin.style.display = 'none';
+          }
+        });
+      })();
+
+    }); // DOMContentLoaded
+  </script>
 </body>
+
 </html>
