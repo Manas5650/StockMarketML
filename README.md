@@ -23,6 +23,26 @@ A machine learning powered web application to predict stock market closing price
 
 ---
 
+### Screenshots  
+
+#### 🏠 Home Page
+![Home Page](screenshots/home.png)
+
+#### 📈 Single Prediction
+![Single Prediction](screenshots/single_prediction.png)
+
+#### 📊 Prediction Graph
+![Prediction Graph](screenshots/prediction_graph.png)
+
+#### 🔀 Compare Two Stocks
+![Compare Stocks](screenshots/compare_stocks.png)
+
+#### 🤖 Compare Models
+![Compare Models](screenshots/compare_models.png)
+
+#### 📂 Upload CSV
+![Upload CSV](screenshots/upload_csv.png)
+
 ## ⚙ How to Run
 ```bash
 # Clone repo
