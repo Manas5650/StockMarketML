@@ -1,21 +1,40 @@
-# # 📈 Stock Market Trend Prediction
+# 📈 Stock Market Prediction Web App
 
-This project predicts stock market trends using Machine Learning models like **Linear Regression** and **Random Forest**.
+A machine learning powered web application to predict stock market closing prices.
 
-## 📌 Features
-- Predicts if stock price will go **Up** or **Down**
-- Uses historical stock market data
-- Data visualization with graphs
-- Machine Learning models comparison
+---
 
-## 🛠 Tools & Technologies
-- **Python** (pandas, numpy, scikit-learn, matplotlib)
-- **Jupyter Notebook**
-- **GitHub** for version control
+## 🚀 Features
+- Point prediction from OHLC values
+- Prediction graph for selected date ranges
+- Compare two stocks in one graph
+- Compare multiple ML models (Linear, Decision Tree, Random Forest, Tuned RF)
+- Upload CSV and get predictions with metrics
+- Evaluation Metrics: RMSE, MAE, R², MAPE
 
-## 🎯 Project Goal
-To create a model that can help understand stock price trends for informed decision making.
+---
 
-## 📅 Status
-- **Day 1**: Repository created ✅
-- Next Step: Data collection and preprocessing
+## 🛠 Tech Stack
+- *Frontend*: HTML, CSS (Bootstrap), JavaScript
+- *Backend*: Python (Flask)
+- *ML Models*: Scikit-learn (LR, DT, RF)
+- *Visualization*: Matplotlib
+- *Data*: Historical stock datasets (CSV)
+
+---
+
+## ⚙ How to Run
+```bash
+# Clone repo
+git clone https://github.com/Manas5650/StockMarketML.git
+cd StockMarketML
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # (Windows: venv\Scripts\activate)
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run Flask app
+python app.py
