@@ -80,7 +80,7 @@ def get_model(dataset_key: str):
 
 # ---------------- dataset paths ----------------
 DATASETS = {
-    "DEFAULT": "all_stocks_5yr.csv",
+    "DEFAULT": "DEFAULT.csv",
     "NIFTY":   "datasets/NIFTY.csv",
     "SP500":   "datasets/SP500.csv",
     "TESLA":   "datasets/TESLA.csv",
