@@ -62,7 +62,7 @@ def safe_mape(y_true, y_pred):
 # ---------------- model paths ----------------
 MODEL_PATHS = {
     "DEFAULT": "random_forest_model_small.pkl",
-    "NIFTY":   "models/NIFTY-RF.pkl",
+    "NIFTY":   "models/NIFTY_RF.pkl",
     "SP500":   "models/SP500_RF.pkl",
     "TESLA":   "models/TESLA_RF.pkl"
 }
