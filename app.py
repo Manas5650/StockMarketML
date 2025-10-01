@@ -81,9 +81,9 @@ def get_model(dataset_key: str):
 # ---------------- dataset paths ----------------
 DATASETS = {
     "DEFAULT": "all_stocks_5yr.csv",
-    "NIFTY":   "datasets/nifty.csv",
-    "SP500":   "datasets/sp500.csv",
-    "TESLA":   "datasets/tesla.csv",
+    "NIFTY":   "datasets/NIFTY.csv",
+    "SP500":   "datasets/SP500.csv",
+    "TESLA":   "datasets/TESLA.csv",
 }
 REQUIRED_FEATURES = ["open", "high", "low", "volume"]
 
