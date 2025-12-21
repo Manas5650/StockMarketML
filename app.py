@@ -1,32 +1,25 @@
-# app.py — dataset-aware backend with per-dataset models
 from flask import Flask, request, jsonify, render_template, make_response
 import io, base64, logging, os
 import joblib
 import numpy as np
 import pandas as pd
-
-# plotting
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-
-# metrics
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from functools import lru_cache
-from flask_cors import CORS  # pip install flask-cors
+from flask_cors import CORS  
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 
-# ---------------- app setup ----------------
 app = Flask(__name__)
 CORS(app)
-app.config["MAX_CONTENT_LENGTH"] = 12 * 1024 * 1024  # 12 MB upload limit
+app.config["MAX_CONTENT_LENGTH"] = 12 * 1024 * 1024  
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ---------------- helpers ----------------
 def json_nocache(payload, status=200):
     resp = make_response(jsonify(payload), status)
     resp.headers["Cache-Control"] = "no-store, max-age=0"
@@ -50,7 +43,6 @@ def get_dataset_key_from_request() -> str:
            or "DEFAULT")
     return str(key).upper()
 
-# Safe MAPE calculation
 def safe_mape(y_true, y_pred):
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
@@ -59,7 +51,6 @@ def safe_mape(y_true, y_pred):
         return float("nan")
     return float(np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100)
 
-# ---------------- model paths ----------------
 MODEL_PATHS = {
     "DEFAULT": "random_forest_model_small.pkl",
     "NIFTY":   "models/nifty_rf.pkl",
@@ -78,7 +69,6 @@ def get_model(dataset_key: str):
         logger.info("Loaded model for %s from %s", key, path)
     return MODELS[key]
 
-# ---------------- dataset paths ----------------
 DATASETS = {
     "DEFAULT": "DEFAULT.csv",
     "NIFTY":   "datasets/NIFTY.csv",
@@ -110,7 +100,6 @@ def _cached_df_for_key(dataset_key: str) -> pd.DataFrame:
 def get_df(dataset_key: str) -> pd.DataFrame:
     return _cached_df_for_key(dataset_key).copy()
 
-# ---------------- routes ----------------
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -174,15 +163,12 @@ def predict():
     except Exception:
         return safe_error("Prediction failed")
 
-# -------- predict_range -------------
 @app.route("/predict_range", methods=["POST"])
 def predict_range():
     try:
         p = request.get_json(force=True) or {}
         dataset = (p.get("dataset") or "DEFAULT").upper()
         model = get_model(dataset)
-
-        # Validate dates
         start_date = pd.to_datetime(p.get("start_date"), errors="coerce")
         end_date   = pd.to_datetime(p.get("end_date"), errors="coerce")
         if pd.isna(start_date) or pd.isna(end_date):
@@ -196,7 +182,7 @@ def predict_range():
         MAX_DATE = d["date"].max().date()
 
         if "Name" in d.columns:
-            # d["Name"] = d["Name"].astype(str).str.upper().str.strip()
+            
             if symbol:
                 d = d[d["Name"].astype(str).str.upper() == symbol].copy()
                 if d.empty:
@@ -233,7 +219,6 @@ def predict_range():
     except Exception:
         return safe_error("Failed to create range prediction")
 
-# -------- compare_range -------------
 @app.route("/compare_range", methods=["POST"])
 def compare_range():
     try:
@@ -303,11 +288,6 @@ def compare_range():
         logger.exception("Compare failed")
         return safe_error("Compare failed")
     
-# ---------------------------
-# Compare Multiple Models
-# ---------------------------
-
-
 @app.route("/compare_models", methods=["POST"])
 def compare_models():
     try:
@@ -320,19 +300,17 @@ def compare_models():
         if not dataset or not start_str or not end_str:
             return jsonify({"error": "Missing required parameters"}), 400
 
-        # Dataset load
         path = os.path.join("datasets", f"{dataset}.csv")
         df = pd.read_csv(path)
         df["date"] = pd.to_datetime(df["date"])
 
-        # symbol column check
         col = "Name" if "Name" in df.columns else "symbol"
 
         mask = (
             (df["date"] >= pd.to_datetime(start_str)) &
             (df["date"] <= pd.to_datetime(end_str))
         )
-        if sym:  # only filter symbol if provided
+        if sym:  
             mask &= (df[col].astype(str).str.upper() == sym)
 
         subset = df.loc[mask].copy()
@@ -342,7 +320,6 @@ def compare_models():
         X = subset[["open", "high", "low", "volume"]]
         y = subset["close"]
 
-        # Models to compare
         models = {
             "Linear Regression": LinearRegression(),
             "Decision Tree": DecisionTreeRegressor(random_state=42),
@@ -368,7 +345,6 @@ def compare_models():
         logging.error(f"Compare Models Error: {e}")
         return jsonify({"error": str(e)}), 500
 
-# -------- CSV upload & predict ---------
 @app.route("/upload_csv", methods=["POST"])
 def upload_csv():
     try:
@@ -403,7 +379,6 @@ def upload_csv():
                 "mape": safe_mape(y_true, preds),
             }
 
-        # CSV to Base64
         import base64, io
         csv_buffer = io.StringIO()
         clean_df.to_csv(csv_buffer, index=False)
@@ -422,8 +397,5 @@ def upload_csv():
     except Exception:
         return safe_error("CSV upload failed")
 
-
-# ---------------------------------------------------
 if __name__ == "__main__":
-    # app.run(host="127.0.0.1", port=5000, debug=False)
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
